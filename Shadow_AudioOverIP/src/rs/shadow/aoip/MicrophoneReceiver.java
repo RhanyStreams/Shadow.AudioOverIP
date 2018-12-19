@@ -9,8 +9,11 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
 
 public class MicrophoneReceiver {
 	
@@ -23,7 +26,7 @@ public class MicrophoneReceiver {
         DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, this.format);
         try {
 			speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-	        speakers.open(this.format);
+	        speakers.open(this.format, speakers.getBufferSize());
 	        speakers.start();
 	        
 	        startReceiving();
@@ -33,14 +36,19 @@ public class MicrophoneReceiver {
 		}
 	}
 	
-	public byte[] mergeArrays(byte[] a, byte[] b) {	    
-	    byte[] c = new byte[a.length + b.length];
-	    System.arraycopy(a, 0, c, 0, a.length);
-	    System.arraycopy(b, 0, c, a.length, b.length);
-	    return c;
+	static Mixer getMixerByName(String toFind) {
+	    for(Mixer.Info info : AudioSystem.getMixerInfo()) {
+	    	String name = info.getName();
+	    	
+	    	if(name.contains(toFind)) {
+		    	System.out.println(name);
+	            return AudioSystem.getMixer(info);
+	    	}
+	    }
+	    return null;
 	}
 	
-	public void startReceiving() {
+	public void startReceiving() throws LineUnavailableException {        
         byte[] data = new byte[96000 / 5];
 		
 		ServerSocket serverSocket = null;

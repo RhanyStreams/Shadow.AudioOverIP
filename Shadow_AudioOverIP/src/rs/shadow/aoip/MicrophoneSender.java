@@ -7,6 +7,8 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
+import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 
 public class MicrophoneSender {
@@ -33,7 +35,7 @@ public class MicrophoneSender {
 		}
 	}
 
-	public void startSending() {        
+	public void startSending() {         
         microphone.start(); 
         data = new byte[microphone.getBufferSize() / 5];
 
@@ -49,6 +51,7 @@ public class MicrophoneSender {
 	        boolean running = true;
 	        
 	        System.out.println("STARTING");
+	        
 	        
 		    while(running) {	
 		        numBytesReadFromMicrophone = microphone.read(data, 0, CHUNK_SIZE);
