@@ -40,36 +40,40 @@ public class JavaSoundRecorderServer {
      * Captures the sound and record into a WAV file
      */
     void start() {
-        try {        	
-        	AudioFormat format = getAudioFormat();
-        	
-        	int portNumber = 55242;         
-     	    ServerSocket serverSocket;
-     	    
-			write("Try Start");
-			serverSocket = new ServerSocket(portNumber);
-			write("Socket initialized");
-	 	    Socket clientSocket = serverSocket.accept();
-	 	    write("Client connected!");
-	 	    
+ 	    
+        acceptInc();
+    }
+    
+    public void acceptInc() {
+    	
+    	int portNumber = 55242;
+ 	    int line = 0;
+ 	    
+ 	    ServerSocket serverSocket = null;
+ 	    Socket clientSocket = null;
+    	try {
+    		serverSocket = new ServerSocket(portNumber);
+	 	    clientSocket = serverSocket.accept();	 	    
 	 	    InputStream iStream = clientSocket.getInputStream();
 	 	    BufferedInputStream ois = new BufferedInputStream(iStream);
 	 	    FileWriter fWriter = new FileWriter(wavFile);
 	 	    
-	 	    Integer line = 0;
-	 	    while((line = ois.read()) != null) {
+	 	    while((line = ois.read()) != -1) {
 	 	    	fWriter.write(line);
 	 	    }
-	 	   
+    	 	
 	 	    fWriter.close();
 	 	    ois.close();
 	 	    iStream.close();
-	 	    clientSocket.close();
+	 	    
+	 	    write("Streams closed");
+	 	    
+			clientSocket.close();
 	 	    serverSocket.close();
-    	 	    
-	 	    write("everything closed");
+	 	    //acceptInc();
         } catch (IOException ioe) {
             ioe.printStackTrace();
+        } finally {
         }
     }
     
