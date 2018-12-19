@@ -10,7 +10,9 @@ import java.net.Socket;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
@@ -69,35 +71,40 @@ public class JavaSoundRecorderServer {
 		    InputStream iStream = clientSocket.getInputStream();
 		    BufferedInputStream ois = new BufferedInputStream(iStream);
 		    FileWriter fWriter = new FileWriter(wavFile);
+		    
+		    DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
+	        SourceDataLine speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+	        
+			byte[] buffer = new byte[1024];
 			
-		    Mixer.Info[] mi = AudioSystem.getMixerInfo();
-			for (Mixer.Info info : mi) {
-				System.out.println("info: " + info);
-			Mixer m = AudioSystem.getMixer(info);
+		    Mixer.Info[] miArray = AudioSystem.getMixerInfo();
+			for (Mixer.Info mi : miArray) {
+				System.out.println("info: " + mi);				
+				write("NAME: "+mi.getName());
+				write("DESC: "+mi.getDescription());
+				write("VEND: "+mi.getVendor());				
+
+				Mixer m = AudioSystem.getMixer(mi);
 				
-				Line[] lines = m.getSourceLines();
+				for(int i = 0; i< m.getTargetLineInfo().length; i++) {
+					write(mi.getName()+"//TARGET LINE: "+m.getTargetLineInfo()[i].toString());
+				}
 				
-				write("NAME: "+info.getName());
-				write("DESC: "+info.getDescription());
-				write("VEND: "+info.getVendor());
-				
-				if(info.getName().contains("Microphone") && info.getDescription().contains("DirectSound Capture")) {
-					write("CONFIRMED Mic");
-					SourceDataLine sDataLine = (SourceDataLine) lines[0];
-					write("Got Data Line");
-					sDataLine.open(format);
-					write("Data Line Open");
-			        byte[] buf = new byte[1024];
-				    
-				    while((line = ois.read()) != -1) {
-				    	fWriter.write(line);
-						sDataLine.write(buf, 0, line);
-				    }
-					write("WRITTEN TO SOURCELINE");
+				if(mi.getName().contains("Display") && mi.getDescription().contains("Mixer")) {
+					speakers.open();
 				}
 			}
+			
+		    while((line = iStream.read(buffer)) != -1) {
+		    	fWriter.write(line);
+		    	
+		    	if(speakers != null) {
+		    		speakers.write(buffer, 0, line);
+		    	}
+		    }
 		
-	fWriter.close();
+		    speakers.close();
+			fWriter.close();
 			ois.close();
 			iStream.close();
 			
