@@ -16,7 +16,7 @@ public class SimpleClient {
 	    int portNumber = 55242;
 	    
 	    try{	        
-		    write("Try Start2");
+		    write("Try Start");
 		    
 		    Socket clientSocket = new Socket(hostName, portNumber);
 		    write("Socket initialized");
