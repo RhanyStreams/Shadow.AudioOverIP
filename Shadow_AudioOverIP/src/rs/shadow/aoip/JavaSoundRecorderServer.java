@@ -1,9 +1,21 @@
 package rs.shadow.aoip;
 
-import javax.sound.sampled.*;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
+import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
  
 /**
  * A sample program is to demonstrate how to record sound in Java
@@ -40,7 +52,6 @@ public class JavaSoundRecorderServer {
      * Captures the sound and record into a WAV file
      */
     void start() {
- 	    
         acceptInc();
     }
     
@@ -48,32 +59,60 @@ public class JavaSoundRecorderServer {
     	
     	int portNumber = 55242;
  	    int line = 0;
+ 	    AudioFormat format = getAudioFormat();
  	    
  	    ServerSocket serverSocket = null;
  	    Socket clientSocket = null;
     	try {
-    		serverSocket = new ServerSocket(portNumber);
-	 	    clientSocket = serverSocket.accept();	 	    
-	 	    InputStream iStream = clientSocket.getInputStream();
-	 	    BufferedInputStream ois = new BufferedInputStream(iStream);
-	 	    FileWriter fWriter = new FileWriter(wavFile);
-	 	    
-	 	    while((line = ois.read()) != -1) {
-	 	    	fWriter.write(line);
-	 	    }
-    	 	
-	 	    fWriter.close();
-	 	    ois.close();
-	 	    iStream.close();
-	 	    
-	 	    write("Streams closed");
-	 	    
+			serverSocket = new ServerSocket(portNumber);
+		    clientSocket = serverSocket.accept();	 	    
+		    InputStream iStream = clientSocket.getInputStream();
+		    BufferedInputStream ois = new BufferedInputStream(iStream);
+		    FileWriter fWriter = new FileWriter(wavFile);
+			
+		    Mixer.Info[] mi = AudioSystem.getMixerInfo();
+			for (Mixer.Info info : mi) {
+				System.out.println("info: " + info);
+			Mixer m = AudioSystem.getMixer(info);
+				
+				Line[] lines = m.getSourceLines();
+				
+				write("NAME: "+info.getName());
+				write("DESC: "+info.getDescription());
+				write("VEND: "+info.getVendor());
+				
+				if(info.getName().contains("Microphone") && info.getDescription().contains("DirectSound Capture")) {
+					write("CONFIRMED Mic");
+					SourceDataLine sDataLine = (SourceDataLine) lines[0];
+					write("Got Data Line");
+					sDataLine.open(format);
+					write("Data Line Open");
+			        byte[] buf = new byte[1024];
+				    
+				    while((line = ois.read()) != -1) {
+				    	fWriter.write(line);
+						sDataLine.write(buf, 0, line);
+				    }
+					write("WRITTEN TO SOURCELINE");
+				}
+			}
+		
+	fWriter.close();
+			ois.close();
+			iStream.close();
+			
+			write("Streams closed");
+			
 			clientSocket.close();
-	 	    serverSocket.close();
-	 	    //acceptInc();
+			serverSocket.close();
+			//acceptInc();
+
         } catch (IOException ioe) {
             ioe.printStackTrace();
-        } finally {
+        } catch (LineUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
         }
     }
     
