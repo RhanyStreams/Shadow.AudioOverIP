@@ -5,7 +5,7 @@
  * @author ruben
  *
  */
-module knoch.shadow.aoip {
+module rs.shadow.aoip {
 	requires java.desktop;
 	requires jdk.internal.le;
 }

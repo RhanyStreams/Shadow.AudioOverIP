@@ -1,4 +1,4 @@
-package knoch.shadow.aoip;
+package rs.shadow.aoip;
 
 import java.io.BufferedReader;
 import java.io.IOException;

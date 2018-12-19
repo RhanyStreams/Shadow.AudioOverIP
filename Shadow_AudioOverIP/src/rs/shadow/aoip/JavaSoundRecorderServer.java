@@ -1,4 +1,4 @@
-package knoch.shadow.aoip;
+package rs.shadow.aoip;
 
 import javax.sound.sampled.*;
 import java.io.*;
@@ -11,10 +11,10 @@ import java.net.Socket;
  */
 public class JavaSoundRecorderServer {
     // record duration, in milliseconds
-    static final long RECORD_TIME = 5 * 1000;
+    static final long RECORD_TIME = 180 * 1000;
  
     // path of the wav file
-    File wavFile = new File("G:/Eclipse/RecordAudio.wav");
+    File wavFile = new File("D:/Test.wav");
  
     // format of audio file
     AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
@@ -73,29 +73,44 @@ public class JavaSoundRecorderServer {
         	
         	AudioFormat format = getAudioFormat();
         	
-            int portNumber = 16557;
-            
-    	    ServerSocket serverSocket = new ServerSocket(portNumber);
-    	    Socket clientSocket = serverSocket.accept();
-    	    //PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-    	    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-    	    
-    	    FileWriter fWriter = new FileWriter(new File("D:/Test.wav"));
-    	    		
-    	    Integer intC;
-    	    		
-    	    while((intC = in.read()) != null) {
-    	    	fWriter.write(intC);
-    	    }
-    	    
-    	    fWriter.close();
-    	    in.close();
-    	    clientSocket.close();
-    	    serverSocket.close();
+        	int portNumber = 55242;         
+     	    ServerSocket serverSocket;
+     	    
+			write("Try Start");
+			serverSocket = new ServerSocket(portNumber);
+			write("Socket initialized");
+	 	    Socket clientSocket = serverSocket.accept();
+	 	    write("Accepted client");
+	 	    System.out.println("Client connected!");
+	 	    
+	 	    InputStream iStream = clientSocket.getInputStream();
+	 	    AudioInputStream ais = new AudioInputStream(iStream, format, 8);
+	 	    		
+	 	    Integer intC;
+	 	    
+	 	    System.out.println("Start read/writing");
+	 	    		
+	 	    while((intC = iStream.read()) != null) {
+	 	    	write("READ");
+	 	    	write(""+intC);
+	 	    	write("WRITTEN");
+	 	    	//fWriter.write(intC);
+	            AudioSystem.write(ais, fileType, wavFile);  
+	 	    }
+	 	    
+	 	    iStream.close();
+    	 	    clientSocket.close();
+    	 	    serverSocket.close();
+    	 	    
+    	 	    write("everything closed");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
+    
+	public static void write(String string) {
+		System.out.println(string);
+	}
  
     /**
      * Closes the target data line to finish capturing and recording

@@ -1,4 +1,4 @@
-package knoch.shadow.aoip;
+package rs.shadow.aoip;
 
 import javax.sound.sampled.*;
 import java.io.*;
