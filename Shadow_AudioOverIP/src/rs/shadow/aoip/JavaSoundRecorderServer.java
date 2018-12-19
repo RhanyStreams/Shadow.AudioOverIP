@@ -14,10 +14,10 @@ public class JavaSoundRecorderServer {
     static final long RECORD_TIME = 180 * 1000;
  
     // path of the wav file
-    File wavFile = new File("D:/Test.wav");
+    File wavFile = new File("D:/Eclipse/RecordAudio.au");
  
     // format of audio file
-    AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
+    AudioFileFormat.Type fileType = AudioFileFormat.Type.AU;
  
     // the line from which audio data is captured
     TargetDataLine line;
@@ -50,19 +50,19 @@ public class JavaSoundRecorderServer {
 			serverSocket = new ServerSocket(portNumber);
 			write("Socket initialized");
 	 	    Socket clientSocket = serverSocket.accept();
-	 	    write("Accepted client");
-	 	    System.out.println("Client connected!");
+	 	    write("Client connected!");
 	 	    
 	 	    InputStream iStream = clientSocket.getInputStream();
-	 	    AudioInputStream ais = new AudioInputStream(iStream, format, 8);
-	 	    		
-	 	    Integer intC;
+	 	    BufferedInputStream ois = new BufferedInputStream(iStream);
+	 	    FileWriter fWriter = new FileWriter(wavFile);
 	 	    
-	 	    System.out.println("Start read/writing");
-	 	    		
-	 	    AudioSystem.write(ais, fileType, wavFile);  
-	 	    
-	 	    ais.close();
+	 	    Integer line = 0;
+	 	    while((line = ois.read()) != null) {
+	 	    	fWriter.write(line);
+	 	    }
+	 	   
+	 	    fWriter.close();
+	 	    ois.close();
 	 	    iStream.close();
 	 	    clientSocket.close();
 	 	    serverSocket.close();

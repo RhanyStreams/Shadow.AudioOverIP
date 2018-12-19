@@ -60,7 +60,7 @@ public class JavaSoundRecorderClient {
             System.out.println(System.currentTimeMillis() + ": Start recording...");
  
             // LOCAL writing
-            AudioSystem.write(ais, fileType, wavFile);  
+            //AudioSystem.write(ais, fileType, wavFile);  
             
             // NETWORK writing            
             String hostName = "25.80.71.32";
@@ -73,10 +73,15 @@ public class JavaSoundRecorderClient {
 		    OutputStream oStream = clientSocket.getOutputStream();
 		    write("OutputStream done");
 		    
+		    BufferedOutputStream bos = new BufferedOutputStream(oStream);
+		    
 		    boolean running = true;
 		    
 		    while(running) {		    	
-	            //AudioSystem.write(ais, fileType, oStream);  
+	            AudioSystem.write(ais, fileType, bos);  
+			    
+			    //write("???"+ais.getFrameLength());
+		    	//bos.write(ais.read(new byte[8]));
 		    	write("SENDING");
 		    }
 		    
