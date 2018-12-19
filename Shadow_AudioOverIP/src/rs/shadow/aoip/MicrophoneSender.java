@@ -12,7 +12,7 @@ import javax.sound.sampled.TargetDataLine;
 public class MicrophoneSender {
 	
 	TargetDataLine microphone;
-    final int CHUNK_SIZE = 256;
+    final int CHUNK_SIZE = 128;
     int numBytesReadFromMicrophone;
     AudioFormat format;
     byte[] data;
@@ -61,6 +61,6 @@ public class MicrophoneSender {
 	
 	public static void main (String[]args) {
 		AudioFormat format = new AudioFormat(48000, 16, 2, true, true);
-		MicrophoneSender mSender = new MicrophoneSender(format);
+		new MicrophoneSender(format);
 	}
 }
