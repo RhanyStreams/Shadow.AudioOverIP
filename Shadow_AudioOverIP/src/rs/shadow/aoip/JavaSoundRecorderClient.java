@@ -39,28 +39,16 @@ public class JavaSoundRecorderClient {
      * Captures the sound and record into a WAV file
      */
     void start() {
+		AudioFormat format = new AudioFormat(48000, 16, 2, true, true);
+	    TargetDataLine microphone;
+	    SourceDataLine speakers;
+	    
         try {
-            AudioFormat format = getAudioFormat();
-            DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-            
-            // checks if system supports the data line
-            if (!AudioSystem.isLineSupported(info)) {
-                System.out.println("Line not supported");
-                System.exit(0);
-            }
-            line = (TargetDataLine) AudioSystem.getLine(info);
-            line.open(format);
-            line.start();   // start capturing
- 
-            System.out.println(System.currentTimeMillis() + ": Start capturing...");
- 
-            AudioInputStream ais = new AudioInputStream(line);
-            write(""+ais.available());
- 
-            System.out.println(System.currentTimeMillis() + ": Start recording...");
- 
-            // LOCAL writing
-            //AudioSystem.write(ais, fileType, wavFile);  
+        	microphone = AudioSystem.getTargetDataLine(format);
+
+	        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+	        microphone = (TargetDataLine) AudioSystem.getLine(info);
+	        microphone.open(format);
             
             // NETWORK writing            
             String hostName = "25.80.71.32";
@@ -78,7 +66,7 @@ public class JavaSoundRecorderClient {
 		    boolean running = true;
 		    
 		    while(running) {		    	
-	            AudioSystem.write(ais, fileType, bos);  
+	            //AudioSystem.write(ais, fileType, bos);  
 			    
 			    //write("???"+ais.getFrameLength());
 		    	//bos.write(ais.read(new byte[8]));

@@ -5,36 +5,41 @@ import java.io.ByteArrayOutputStream;
 import javax.sound.sampled.*;
 
 public class TestRecAndPlay {
-	public static void name() {
-		AudioFormat format = new AudioFormat(8000.0f, 16, 1, true, true);
+	public static void main(String[]args) {
+		AudioFormat format = new AudioFormat(48000, 16, 2, true, true);
 	    TargetDataLine microphone;
 	    SourceDataLine speakers;
 	    try {
-	        microphone = AudioSystem.getTargetDataLine(format);
-
 	        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+	        microphone = AudioSystem.getTargetDataLine(format);
 	        microphone = (TargetDataLine) AudioSystem.getLine(info);
 	        microphone.open(format);
 
 	        ByteArrayOutputStream out = new ByteArrayOutputStream();
-	        int numBytesRead;
+	        int numBytesReadFromMicrophone;
+	        int overallBytesRead = 0;
 	        int CHUNK_SIZE = 1024;
 	        byte[] data = new byte[microphone.getBufferSize() / 5];
+	        //System.out.println(microphone.getBufferSize()+"BUFFER");
+	        
 	        microphone.start();
-
-	        int bytesRead = 0;
+	        
 	        DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
 	        speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
 	        speakers.open(format);
 	        speakers.start();
-	        while (bytesRead < 100000) {
-	            numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
-	            bytesRead += numBytesRead;
+	        
+	        boolean running = true;
+	        while (running) {
+	            numBytesReadFromMicrophone = microphone.read(data, 0, CHUNK_SIZE);
+	            //overallBytesRead += numBytesReadFromMicrophone;
 	            // write the mic data to a stream for use later
-	            out.write(data, 0, numBytesRead); 
+	            //out.write(data, 0, numBytesReadFromMicrophone); 
 	            // write mic data to stream for immediate playback
-	            speakers.write(data, 0, numBytesRead);
+	            System.out.println("DATA:"+data+"//BYTES:"+numBytesReadFromMicrophone);
+	            speakers.write(data, 0, numBytesReadFromMicrophone);
 	        }
+	        
 	        speakers.drain();
 	        speakers.close();
 	        microphone.close();
