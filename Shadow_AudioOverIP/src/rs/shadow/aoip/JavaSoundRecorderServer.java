@@ -40,37 +40,7 @@ public class JavaSoundRecorderServer {
      * Captures the sound and record into a WAV file
      */
     void start() {
-        try {
-            /*AudioFormat format = getAudioFormat();
-            DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-
-            String hostName = "";
-            int portNumber = 16557;
-            
-            Socket echoSocket = new Socket(hostName, portNumber);
-            PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
-            
-            // checks if system supports the data line
-            if (!AudioSystem.isLineSupported(info)) {
-                System.out.println("Line not supported");
-                System.exit(0);
-            }
-            line = (TargetDataLine) AudioSystem.getLine(info);
-            line.open(format);
-            line.start();   // start capturing
- 
-            System.out.println(System.currentTimeMillis() + ": Start capturing...");
- 
-            AudioInputStream ais = new AudioInputStream(line);
- 
-            System.out.println(System.currentTimeMillis() + ": Start recording...");
- 
-            // start recording
-            AudioSystem.write(ais, fileType, wavFile);
-            while(true) {
-            	out.write(ais.read());
-            }*/
-        	
+        try {        	
         	AudioFormat format = getAudioFormat();
         	
         	int portNumber = 55242;         
@@ -90,19 +60,14 @@ public class JavaSoundRecorderServer {
 	 	    
 	 	    System.out.println("Start read/writing");
 	 	    		
-	 	    while((intC = iStream.read()) != null) {
-	 	    	write("READ");
-	 	    	write(""+intC);
-	 	    	write("WRITTEN");
-	 	    	//fWriter.write(intC);
-	            AudioSystem.write(ais, fileType, wavFile);  
-	 	    }
+	 	    AudioSystem.write(ais, fileType, wavFile);  
 	 	    
+	 	    ais.close();
 	 	    iStream.close();
-    	 	    clientSocket.close();
-    	 	    serverSocket.close();
+	 	    clientSocket.close();
+	 	    serverSocket.close();
     	 	    
-    	 	    write("everything closed");
+	 	    write("everything closed");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

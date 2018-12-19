@@ -13,10 +13,10 @@ public class JavaSoundRecorderClient {
     static final long RECORD_TIME = 180 * 1000;
  
     // path of the wav file
-    File wavFile = new File("G:/Eclipse/RecordAudio.wav");
+    File wavFile = new File("D:/Eclipse/RecordAudio.au");
  
     // format of audio file
-    AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
+    AudioFileFormat.Type fileType = AudioFileFormat.Type.AU;
  
     // the line from which audio data is captured
     TargetDataLine line;
@@ -60,10 +60,9 @@ public class JavaSoundRecorderClient {
             System.out.println(System.currentTimeMillis() + ": Start recording...");
  
             // LOCAL writing
-            //AudioSystem.write(ais, fileType, wavFile);  
+            AudioSystem.write(ais, fileType, wavFile);  
             
-            // NETWORK writing
-            
+            // NETWORK writing            
             String hostName = "25.80.71.32";
     	    int portNumber = 55242;    
 		    write("Try Start");
@@ -74,18 +73,10 @@ public class JavaSoundRecorderClient {
 		    OutputStream oStream = clientSocket.getOutputStream();
 		    write("OutputStream done");
 		    
-		    boolean running = true;		    
-		    //Integer line;
+		    boolean running = true;
 		    
-		    // NETWORK writing
-		    while(running) {
-		    	/*write("READING");
-		    	line = isr.read();
-		    	write(""+line);
-		    	oStream.write(line);
-		    	System.out.println("WRITTEN");*/
-		    	
-		    	oStream.write(ais.read(new byte[8]));
+		    while(running) {		    	
+	            //AudioSystem.write(ais, fileType, oStream);  
 		    	write("SENDING");
 		    }
 		    
